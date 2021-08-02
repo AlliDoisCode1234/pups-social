@@ -28,6 +28,8 @@ app.get("/users", (req, res) => {
     res.send("welcome to user's page")
 })
 
+// Routes
+
 app.use("/api/users", userRoute)
 app.use("/api/auth", authRoute)
 app.use("/api/posts", postRoute)
