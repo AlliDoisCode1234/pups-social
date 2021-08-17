@@ -7,6 +7,9 @@ const morgan = require("morgan")
 const userRoute = require("../api/routes/users")
 const authRoute = require("../api/routes/auth")
 const postRoute = require("../api/routes/posts")
+const multer = require("multer")
+
+const path = require("path");
 
 dotenv.config();
 
@@ -14,19 +17,32 @@ mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true,  useUnifiedTopol
     console.log("Connected to MongoDB")
 });
 
+app.use("/images", express.static(path.join(__dirname, "public/images")));
+
 // Middlewares
 
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"))
 
-app.get("/", (req, res) => {
-    res.send("welcome to homepage")
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.body.name);
+  },
+});
+
+const upload = multer({storage:storage});
+app.post("/api/upload", upload.single("file"), (req, res,) => {
+    try{
+        return res.status(200).json("File uploaded successfully")
+    } catch(err){
+        console.log(err)
+    }
 })
 
-app.get("/users", (req, res) => {
-    res.send("welcome to user's page")
-})
 
 // Routes
 
